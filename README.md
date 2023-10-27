@@ -1,5 +1,7 @@
 # CellPatchExtraction
 
+![Example Image of Patches](./__documentation/cellpatchextraction.png) 
+
 ## Overview
 
 This repository contains code for extracting single-cell patches from microscopic images. The primary objective is to facilitate the analysis of cellular structures and their properties.
@@ -63,8 +65,6 @@ patches = extract_patches(image, model, cellpose_kwargs={"diameter": diameter, "
 
 gridPlot(patches)
 ```
-
-![Example Image of Patches](./__documentation/cellpatchextraction.png) 
 
 ## Contributing
 
