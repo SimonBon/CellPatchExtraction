@@ -18,7 +18,7 @@ This repository contains code for extracting single-cell patches from microscopi
 - OpenCV
 - NumPy
 - PyTorch
-- Cellpose
+- [Cellpose](https://github.com/MouseLand/cellpose)
 - Scipy
 - tifffile
 - matplotlib
