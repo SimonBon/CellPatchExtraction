@@ -64,7 +64,7 @@ patches = extract_patches(image, model, cellpose_kwargs={"diameter": diameter, "
 gridPlot(patches)
 ```
 
-![Example Image of Patches](./__documentation/cellpatchextraction.eps) 
+![Example Image of Patches](./__documentation/cellpatchextraction.png) 
 
 ## Contributing
 
