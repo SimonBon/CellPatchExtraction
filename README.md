@@ -26,7 +26,15 @@ git clone https://github.com/SimonBon/CellPatchExtraction.git
 
 Install the required packages:
 
+Either install the packages in an existing enironment or create a new one using:
+
+
 ```bash
+cd CellPatchExtraction
+
+conda create -n CellPatches python=3.9
+conda activate Cellpatches
+
 pip install -r requirements.txt
 ```
 
