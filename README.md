@@ -14,9 +14,14 @@ This repository contains code for extracting single-cell patches from microscopi
 
 ## Requirements
 
-- Python 3.x
+- Python 3.9
 - OpenCV
 - NumPy
+- PyTorch
+- Cellpose
+- Scipy
+- tifffile
+- matplotlib
 
 ## Installation
 
