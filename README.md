@@ -41,9 +41,19 @@ Run the example notebook `Example.ipynb` to get started.
 For more control, you can directly use the `extraction.py` script located in the `src` directory.
 
 ```python
-from src import extraction
+from CellPatchExtraction import extraction
+from plotutils import gridPlot #used for visualization
 
-# Your code here
+image_path = "path_to_TIFF_image" # or already loaded image as np.ndarray
+model = "path_to_model" # or CellposeModel or one of "CP_TU" or "CP_BM"
+diameter = 50 # set mean size of nuclei
+min_size = 400 # set minimum size of nuclei, everything below will be discarded
+patch_size = 32 # define size of patches
+nuclear_channel = 38 # if image has more than 3 channels, define which channel should be used for segmentation
+
+patches = extract_patches(image, model, cellpose_kwargs={"diameter": diameter, "min_size": min_size}, patch_size=32, nuclear_channel=38)
+
+gridPlot(patches)
 ```
 
 ## Contributing
