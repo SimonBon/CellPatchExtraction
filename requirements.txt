@@ -1,0 +1,6 @@
+typing-extensions
+scipy
+numpy
+tifffile
+cellpose
+torch
