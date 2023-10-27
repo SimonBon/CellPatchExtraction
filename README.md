@@ -20,9 +20,9 @@ This repository contains code for extracting single-cell patches from microscopi
 
 Clone the repository:
 
-\`\`\`bash
+```bash
 git clone https://github.com/SimonBon/CellPatchExtraction.git
-\`\`\`
+```
 
 Install the required packages:
 
