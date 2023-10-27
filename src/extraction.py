@@ -161,7 +161,8 @@ def extract_patches(image_path_or_array: Union[str, np.ndarray],
                     patch_size: int = 50, 
                     cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 50, "min_size": 10},
                     return_all: bool = False,
-                    nuclear_channel=2) -> Any:
+                    nuclear_channel=2,
+                    return_segmentation=False) -> Any:
     """
     Extract single nucleus patches from an image using Cellpose model and custom patch extraction logic.
     
@@ -184,6 +185,12 @@ def extract_patches(image_path_or_array: Union[str, np.ndarray],
     image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size)
     
     if return_all:
-        return image_patches, mask_patches, surrounding_patches, background_patches, coords
+        ret_val = image_patches, mask_patches, surrounding_patches, background_patches, coords
     else:
-        return image_patches
+        ret_val = image_patches
+        
+    if return_segmentation:
+        
+        return ret_val, masks
+    
+    return ret_val
