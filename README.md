@@ -26,9 +26,9 @@ git clone https://github.com/SimonBon/CellPatchExtraction.git
 
 Install the required packages:
 
-\`\`\`bash
+```bash
 pip install -r requirements.txt
-\`\`\`
+```
 
 ## Usage
 
@@ -40,11 +40,11 @@ Run the example notebook `Example.ipynb` to get started.
 
 For more control, you can directly use the `extraction.py` script located in the `src` directory.
 
-\`\`\`python
+```python
 from src import extraction
 
 # Your code here
-\`\`\`
+```
 
 ## Contributing
 
