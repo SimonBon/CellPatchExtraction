@@ -4,7 +4,7 @@ import numpy as np
 import tifffile
 from cellpose import models
 import os
-from .. import AVAIL_MODELS, CELLPOSE_PATH, TYPES
+from . import AVAIL_MODELS, CELLPOSE_PATH, TYPES
 import torch
 
 def get_files(path):
