@@ -6,3 +6,4 @@ torch==2.0.1
 cellpose==2.2.3
 matplotlib
 psutil
+cellplot
