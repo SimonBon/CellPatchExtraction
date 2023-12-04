@@ -6,7 +6,8 @@ import warnings
 import tifffile
 from tqdm import tqdm
 import random
-from time import time
+from time import perf_counter
+import logging
 
 # Define the channel order explicitly
 CHANNEL_ORDER = {'R': 0, 'G': 1, 'B': 2}
@@ -39,29 +40,21 @@ def combine_to_RGB(folder_path, num_images=np.inf, shuffle_images=False, return_
         
         channels = []
         for rgb_file in sorted(matching_files)[::-1]:  # Sorting ensures R, G, B order if filenames are properly named
-            s = time()
             image = tifffile.imread(rgb_file).astype(float)
-            print("Image Loading: ", time()-s)
-            s=time()
             if normalize:
-                image /= image.max()
-
+                image = np.clip(image /np.percentile(image.flatten(), 99.99), 0, 1)
             channels.append(image)
-            print("Normalize: ", time()-s)
-        
-        s=time()
+
         rgb_image = np.stack(channels, axis=-1)  # Reverse the channels list to get RGB order
         rgb_images.append(rgb_image)
-        print("Stacking Appending: ", time()-s)
 
-        
         if len(rgb_images) > num_images:
             break
 
     if return_identifiers:
-        return np.array(rgb_images), unique_file_identifiers
+        return rgb_images, unique_file_identifiers
     
-    return np.array(rgb_images)  # Convert the list of images to a NumPy array1
+    return rgb_images  # Convert the list of images to a NumPy array1
 
 def get_random_crop(image, crop_size=(128, 128)):
     

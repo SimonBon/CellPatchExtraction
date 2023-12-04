@@ -5,8 +5,6 @@ package_name = "CellPatchExtraction"
 def read_requirements():
     with open('requirements.txt', 'r') as file:
         return [line.strip() for line in file.readlines()]
-    
-print(get_version(package_name))
 
 setup(
     name=package_name,
