@@ -26,12 +26,10 @@ def combine_to_RGB(folder_path, num_images=np.inf, shuffle_images=False, return_
     if shuffle_images:
         random.shuffle(unique_file_identifiers)
 
-
-
     rgb_images = []
-    progress_bar = tqdm(unique_file_identifiers) if np.isinf(num_images) else tqdm(unique_file_identifiers[:num_images])
+    unique_file_identifiers = unique_file_identifiers if np.isinf(num_images) else unique_file_identifiers[:num_images]
     
-    for file_identifier in progress_bar:
+    for file_identifier in tqdm(unique_file_identifiers):
         matching_files = [f for f in files if re.findall(f"{file_identifier}.{{{1}}}\.", str(f))]
         
         if len(matching_files) != 3:
