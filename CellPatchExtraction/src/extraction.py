@@ -235,7 +235,7 @@ def extract_patches(image: Union[str, np.ndarray],
     image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size, exclude_edges=exclude_edges, use_surrounding=use_surrounding)
     
     if return_all:
-        ret_val = image_patches, mask_patches, surrounding_patches, background_patches, coords
+        ret_val = {"image_patches": image_patches, "mask_patches": mask_patches, "surrounding_mask_patches": surrounding_patches, "background_mask_patches": background_patches, "coordinates": coords}
     else:
         ret_val = image_patches
         
