@@ -7,11 +7,43 @@ import os
 from . import AVAIL_MODELS, CELLPOSE_PATH, TYPES
 import torch
 
+def remove_masks(image, min_size=None, max_size=None):
+    """
+    Remove masks from the image that are larger than the given max_size.
+
+    :param image: numpy array representing the image with segmentation masks.
+    :param max_size: threshold for mask size.
+    :return: numpy array with large masks removed.
+    """
+    if min_size is None:
+        min_size = 0
+    
+    if max_size is None:
+        max_size = np.inf
+    
+    unique_colors = np.unique(image)
+    
+    for color in unique_colors:
+        # Create a mask for the current color
+        mask = image == color
+
+        # Calculate the size of the current mask
+        mask_size = np.sum(mask)
+        # If the mask is larger than the threshold, remove it
+        if mask_size > max_size or mask_size < min_size:
+            image[mask] = 0  # Assuming you want to set it to black
+
+    return image
+    
+    
+
 def segment_image(image: Union[str, np.ndarray], 
                   model: Union[str, models.Cellpose, models.CellposeModel], 
-                  *, cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 50, "min_size": 10},
+                  cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 50},
                   nuclear_channel=2,
                   device=None,
+                  max_size=None,
+                  min_size=None,
                   do_3D=False) -> Tuple[np.ndarray, np.ndarray]:
     """
     Segment an image using Cellpose.
@@ -42,13 +74,16 @@ def segment_image(image: Union[str, np.ndarray],
         setattr(model, k, v)
     
     if do_3D:
-        masks, _, _ = model.eval(image, diameter=model.diameter, min_size=model.min_size, do_3D=do_3D)
+        masks, _, _ = model.eval(image, do_3D=do_3D, **cellpose_kwargs)
     elif image.ndim > 2:
-        masks, _, _ = model.eval(image[..., nuclear_channel], diameter=model.diameter, min_size=model.min_size)
+        masks, _, _ = model.eval(image[..., nuclear_channel], **cellpose_kwargs)
     elif image.ndim == 2:
-        masks, _, _ = model.eval(image, diameter=model.diameter, min_size=model.min_size)
+        masks, _, _ = model.eval(image, **cellpose_kwargs)
     else:
         raise ValueError(f"Invalid shape for image to segment. Dimension {image.shape} not implemented")
+    
+    if max_size is not None:
+        masks = remove_masks(masks, min_size=min_size, max_size=max_size)
     
     return masks, image
     
