@@ -201,11 +201,16 @@ def extract_and_pad_objects(mask: np.ndarray,
 def extract_patches(image: Union[str, np.ndarray], 
                     model: Union[str, models.Cellpose, models.CellposeModel], 
                     patch_size: int = 50, 
-                    cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 50, "min_size": 10},
+                    cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 50},
+                    max_size=None,
+                    min_size=None,
+                    do_3D=False,
                     return_all: bool = False,
                     nuclear_channel=2,
                     return_segmentation=False,
-                    device=None) -> Any:
+                    device=None,
+                    exclude_edges=True,
+                    use_surrounding=False) -> Any:
     """
     Extract single nucleus patches from an image using Cellpose model and custom patch extraction logic.
     
@@ -224,10 +229,10 @@ def extract_patches(image: Union[str, np.ndarray],
     image = image/image.max()
     
     # Segment the image to get nucleus masks and the original image
-    masks, original_image = segment_image(image, model, cellpose_kwargs=cellpose_kwargs, nuclear_channel=nuclear_channel, device=device)
+    masks, original_image = segment_image(image, model, cellpose_kwargs=cellpose_kwargs, nuclear_channel=nuclear_channel, device=device, max_size=max_size, min_size=min_size, do_3D=False)
     
     # Extract and pad objects (i.e., nucleus patches) based on the masks and original image
-    image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size)
+    image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size, exclude_edges=exclude_edges, use_surrounding=use_surrounding)
     
     if return_all:
         ret_val = image_patches, mask_patches, surrounding_patches, background_patches, coords
