@@ -82,7 +82,7 @@ def segment_image(image: Union[str, np.ndarray],
     else:
         raise ValueError(f"Invalid shape for image to segment. Dimension {image.shape} not implemented")
     
-    if max_size is not None:
+    if max_size is not None or min_size is not None:
         masks = remove_masks(masks, min_size=min_size, max_size=max_size)
     
     return masks, image
