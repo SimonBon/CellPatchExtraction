@@ -1,1 +1,1 @@
-recursive-include .CellPatchExtraction/.cellpose_model *
+recursive-include CellPatchExtraction/.cellpose_model *
