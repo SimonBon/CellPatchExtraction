@@ -6,6 +6,9 @@ from cellpose import models
 import os
 from . import AVAIL_MODELS, CELLPOSE_PATH, TYPES
 import torch
+from scipy.ndimage import binary_dilation
+from typing import Union
+
 
 def remove_masks(image, min_size=None, max_size=None):
     """
@@ -128,7 +131,8 @@ def extract_and_pad_objects(mask: np.ndarray,
                             image: np.ndarray, 
                             patch_size: int, 
                             exclude_edges: bool = True, 
-                            use_surrounding: bool = False) -> Tuple[List[np.ndarray], List[np.ndarray], List[np.ndarray], List[np.ndarray], List[Tuple[int, int]]]:
+                            use_surrounding: bool = False,
+                            dilate_mask: Union[bool, int] = False) -> Tuple[List[np.ndarray], List[np.ndarray], List[np.ndarray], List[np.ndarray], List[Tuple[int, int]]]:
     """
     Extracts and pads objects based on a mask and original image.
     
@@ -181,8 +185,15 @@ def extract_and_pad_objects(mask: np.ndarray,
         else:
             raise ValueError(f"Image of shape {image.shape} not implemented")
 
-        
         cell_mask = (mask_patch == label).astype(int)
+        
+        if dilate_mask:
+            structure = np.ones((3, 3))
+            cell_mask = binary_dilation(cell_mask, 
+                                           structure=structure, 
+                                           iterations=dilate_mask if isinstance(dilate_mask, int) else 1
+                                           ).astype(cell_mask.dtype)
+
         surrounding_mask = np.logical_and(mask_patch != label, mask_patch != 0).astype(int)
         background_mask = (mask_patch == 0).astype(int)
         
@@ -210,7 +221,8 @@ def extract_patches(image: Union[str, np.ndarray],
                     return_segmentation=False,
                     device=None,
                     exclude_edges=True,
-                    use_surrounding=False) -> Any:
+                    use_surrounding=False,
+                    dilate_mask=False) -> Any:
     """
     Extract single nucleus patches from an image using Cellpose model and custom patch extraction logic.
     
@@ -232,7 +244,7 @@ def extract_patches(image: Union[str, np.ndarray],
     masks, original_image = segment_image(image, model, cellpose_kwargs=cellpose_kwargs, nuclear_channel=nuclear_channel, device=device, max_size=max_size, min_size=min_size, do_3D=False)
     
     # Extract and pad objects (i.e., nucleus patches) based on the masks and original image
-    image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size, exclude_edges=exclude_edges, use_surrounding=use_surrounding)
+    image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size, exclude_edges=exclude_edges, use_surrounding=use_surrounding, dilate_mask=dilate_mask)
     
     if return_all:
         ret_val = {"image_patches": image_patches, "mask_patches": mask_patches, "surrounding_mask_patches": surrounding_patches, "background_mask_patches": background_patches, "coordinates": coords, "segmentation": masks}
