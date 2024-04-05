@@ -211,8 +211,8 @@ def extract_and_pad_objects(mask: np.ndarray,
 
 def extract_patches(image: Union[str, np.ndarray], 
                     model: Union[str, models.Cellpose, models.CellposeModel], 
-                    patch_size: int = 50, 
-                    cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 50},
+                    patch_size: int = 64, 
+                    cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 32},
                     max_size=None,
                     min_size=None,
                     do_3D=False,
@@ -237,6 +237,9 @@ def extract_patches(image: Union[str, np.ndarray],
         If return_all is True, a tuple containing lists of image_patches, mask_patches, surrounding_patches, background_patches, and coords.
         If return_all is False, a list of numpy arrays, each representing an extracted nucleus patch.
     """
+    image = tifffile.imread(image) if isinstance(image, str) else image
+    if not isinstance(image, np.ndarray):
+        raise TypeError("Invalid type for 'image'. Must be either str or np.ndarray.")
     
     image = image/image.max()
     
