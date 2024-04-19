@@ -8,6 +8,7 @@ from . import AVAIL_MODELS, CELLPOSE_PATH, TYPES
 import torch
 from scipy.ndimage import binary_dilation
 from typing import Union
+from BioUtensils.normalize import subtract_background
 
 
 def remove_masks(image, min_size=None, max_size=None):
@@ -39,7 +40,6 @@ def remove_masks(image, min_size=None, max_size=None):
     return image
     
     
-
 def segment_image(image: Union[str, np.ndarray], 
                   model: Union[str, models.Cellpose, models.CellposeModel], 
                   cellpose_kwargs: Dict[str, Union[int, float]] = {"diameter": 50},
@@ -222,7 +222,8 @@ def extract_patches(image: Union[str, np.ndarray],
                     device=None,
                     exclude_edges=True,
                     use_surrounding=False,
-                    dilate_mask=False) -> Any:
+                    dilate_mask=False,
+                    substract_background=False) -> Any:
     """
     Extract single nucleus patches from an image using Cellpose model and custom patch extraction logic.
     
@@ -242,9 +243,13 @@ def extract_patches(image: Union[str, np.ndarray],
         raise TypeError("Invalid type for 'image'. Must be either str or np.ndarray.")
     
     image = image/image.max()
-    
+
     # Segment the image to get nucleus masks and the original image
     masks, original_image = segment_image(image, model, cellpose_kwargs=cellpose_kwargs, nuclear_channel=nuclear_channel, device=device, max_size=max_size, min_size=min_size, do_3D=False)
+    
+    if substract_background:
+        
+        original_image = subtract_background(original_image, masks, expand_masks=1):
     
     # Extract and pad objects (i.e., nucleus patches) based on the masks and original image
     image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size, exclude_edges=exclude_edges, use_surrounding=use_surrounding, dilate_mask=dilate_mask)
