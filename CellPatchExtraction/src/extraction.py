@@ -249,7 +249,7 @@ def extract_patches(image: Union[str, np.ndarray],
     
     if substract_background:
         
-        original_image = subtract_background(original_image, masks, expand_masks=1):
+        original_image = subtract_background(original_image, masks, expand_masks=1)
     
     # Extract and pad objects (i.e., nucleus patches) based on the masks and original image
     image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size, exclude_edges=exclude_edges, use_surrounding=use_surrounding, dilate_mask=dilate_mask)
