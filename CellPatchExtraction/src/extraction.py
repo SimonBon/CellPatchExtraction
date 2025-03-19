@@ -7,8 +7,11 @@ import os
 from . import AVAIL_MODELS, CELLPOSE_PATH, TYPES
 import torch
 from scipy.ndimage import binary_dilation
+from skimage.morphology import dilation
 from typing import Union
 from BioUtensils.normalize import subtract_background
+from copy import deepcopy
+from skimage.morphology import disk
 
 
 def remove_masks(image, min_size=None, max_size=None):
@@ -47,7 +50,8 @@ def segment_image(image: Union[str, np.ndarray],
                   device=None,
                   max_size=None,
                   min_size=None,
-                  do_3D=False) -> Tuple[np.ndarray, np.ndarray]:
+                  do_3D=False,
+                  dilate_masks=0) -> Tuple[np.ndarray, np.ndarray]:
     """
     Segment an image using Cellpose.
     
@@ -87,6 +91,23 @@ def segment_image(image: Union[str, np.ndarray],
     
     if max_size is not None or min_size is not None:
         masks = remove_masks(masks, min_size=min_size, max_size=max_size)
+       
+    import matplotlib.pyplot as plt
+    from cellplot.segmentation import rand_col_seg 
+        
+    if dilate_masks:
+        orig_masks = deepcopy(masks)
+        footprint = disk(1)
+        iterations = dilate_masks if isinstance(dilate_masks, int) else 1
+        for _ in range(iterations):
+            masks = dilation(masks, 
+                footprint=footprint, 
+                #iterations=dilate_masks if isinstance(dilate_masks, int) else 1
+                ).astype(masks.dtype)
+            
+            orig_masks[orig_masks == 0] = masks[orig_masks == 0]
+
+        masks = orig_masks
     
     return masks, image
     
@@ -251,7 +272,14 @@ def extract_patches(image: Union[str, np.ndarray],
         original_image = subtract_background(original_image, masks, expand_masks=1)
     
     # Extract and pad objects (i.e., nucleus patches) based on the masks and original image
-    image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(masks, original_image, patch_size, exclude_edges=exclude_edges, use_surrounding=use_surrounding, dilate_mask=dilate_mask)
+    image_patches, mask_patches, surrounding_patches, background_patches, coords = extract_and_pad_objects(
+                                                                                                        masks, 
+                                                                                                        original_image, 
+                                                                                                        patch_size, 
+                                                                                                        exclude_edges=exclude_edges, 
+                                                                                                        use_surrounding=use_surrounding, 
+                                                                                                        dilate_mask=dilate_mask
+                                                                                                    )
     
     if return_all:
         ret_val = {"image_patches": image_patches, "mask_patches": mask_patches, "surrounding_mask_patches": surrounding_patches, "background_mask_patches": background_patches, "coordinates": coords, "segmentation": masks}
